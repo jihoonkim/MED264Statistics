@@ -1,0 +1,168 @@
+---
+title: "Test"
+author: "Jihoon Kim"
+date: "11/3/2017"
+output: beamer_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## R  
+
+R is 'GNU S', a freely available language and environment for statistical computing and graphics which provides a wide variety of statistical and graphical techniques
+
+- linear and nonlinear modeling
+- statistial tests
+- time series analysis
+- classification
+- clustering
+- genomics
+
+
+Download and install R (precompiled binary distribution) from the nearest R mirror site, <https://cran.stat.ucla.edu>
+
+
+
+
+## R Markdown
+
+This is an R Markdown presentation. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document.
+
+## Slide with Bullets
+
+- Bullet 1
+- Bullet 2
+- Bullet 3
+
+## Slide with R Output
+
+```{r cars, echo = TRUE}
+summary(cars)
+```
+
+## Slide with Plot
+
+```{r pressure}
+plot(pressure)
+```
+
+
+## Look and feel of R 
+
+```{r}
+1+2
+2*2
+2*2*2*2
+2^4
+```
+
+## More calculations in R
+
+```{r}
+log(16, 2)
+pi
+pi*(3^2)
+sin(pi/2)
+```
+
+
+## Simple plot in R
+
+```{r}
+x = c(-10:10)
+y = x^3
+plot(x, y)
+```
+
+
+## Make the figure fancier by adding more plotting parameters
+
+```{r}
+x = c(-10:10)
+y = x^3
+plot(x, y, pch=1, lty=1, type="b", col="blue")
+```
+
+
+## Try changing parameter values 
+
+```{r}
+x = c(-5:10)
+y = x^3
+plot(x, y, pch=15, lty=2, type="b", col="orange")
+```
+
+
+
+
+## R Studio 
+
+RStudio is a set of integrated tools designed to help you be more prudictive with R. It includes 
+
+- console
+- syntax-highlighting editor that supports direct code execution
+- plotting
+- history
+- debugging 
+- workspace management. 
+
+Download and install RStudio from <https://www.rstudio.com/products/rstudio/download>
+
+
+## R Studio text editor
+R Studio -> File -> New File -> R Script to create an R code file, type commands below in the text file, click the first line, and click Run button three times.
+
+```{r, eval=FALSE}
+x = c(-10:10)
+y = x^3
+plot(x, y, pch=1, lty=1, type="b", col="blue")
+```
+
+
+## R Objects
+Text goes here
+
+
+
+
+## R Packages
+
+R packages are collections of functions, data, and complied code in a ready-to-use format with enriched documentation. 
+
+Use R Studio to install R packages 
+
+- package name 1
+- package name 2
+- package name 3
+
+
+## Survival analysis
+
+
+
+
+
+
+
+## Principal Component Analysis (PCA)
+
+
+## R code for PCA with automobile data
+
+
+## PCA plot with automobile data
+
+## Application of PCA to GWAS
+
+
+## R code for Population Stratification using PCA
+
+
+## Plot of population stratification 
+
+
+## Population structure within Europe (Novembre et al. 2008)
