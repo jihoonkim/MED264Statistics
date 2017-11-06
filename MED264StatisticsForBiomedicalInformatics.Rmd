@@ -34,7 +34,7 @@ Below, take the comments out to run in R
 
 ```{r}
 
-# myPackages = c( "CompQuadForm", "ggplot2", "irr", "knitr", "minqa",  "pwr", "survival")
+# myPackages = c( "CompQuadForm", "ggplot2", "irr", "knitr", "minqa", "prLogistic", "pROC", "pwr", "ResourceSelection",  "survival")
 # install.packages( myPackages )
 
 ### For Mac OS. Install an R package directly from a URL to a tar file
@@ -443,10 +443,80 @@ data(diagnoses)
 kappa2( diagnoses[,1:2] )
 ```
 
-
 ### Logistic Regression
 
 
+### Example: logistic regression, treatment for drug abuse
+
+Goal was to compare treatment programs of different durations in the reduction of drug abuse and in the prevention of high-risk HIV behavior.
+
+- DFREE: returned to drug use prior the study end date
+
+- AGE: age at enrollment
+
+- IVHX: IV drug use history at admission
+
+- NRUGTX: number of prior drug treatment
+
+- RACE: subject race (0 for white,  and otherwise 1)
+
+- TREAT: treatment site (0 for A and 1 for B)
+
+Reference: Hosmer DW and Lemeshow S, Applied Logistic Regression, Johsn Wiley and Sons, Inc.
+
+### Estimated coefficients in a treatment study for drug abuse
+```{r}
+library(pROC)
+library(ResourceSelection)
+
+rawdata = read.table("http://course1.winona.edu/bdeppa/Biostatistics/Data%20Sets/umaru.txt",
+                 header = T)
+uis = rawdata
+uis$IVHX = factor(rawdata$IVHX)
+uis$RACE = factor(rawdata$RACE)
+uis$TREAT = factor(rawdata$TREAT)
+uis$SITE = factor(rawdata$SITE)
+
+m1 = glm(DFREE ~ AGE + NDRUGTX + IVHX  + RACE+ TREAT, data = uis, family="binomial")
+round(summary(m1)$coef, 3)
+
+### esimated coefficients and p-values
+kable( round(summary(m1)$coef, 3) )
+
+
+```
+
+
+### ROC Curve
+
+```{r}
+### load R packages
+library(pROC)
+library(ResourceSelection)
+
+### load data from URL
+rawdata = read.table("http://course1.winona.edu/bdeppa/Biostatistics/Data%20Sets/umaru.txt",
+                 header = T)
+
+### convert to factor variable
+uis = rawdata
+uis$IVHX = factor(rawdata$IVHX)
+uis$RACE = factor(rawdata$RACE)
+uis$TREAT = factor(rawdata$TREAT)
+uis$SITE = factor(rawdata$SITE)
+
+
+### fit a logistic regression model
+m1 = glm(DFREE ~ AGE + NDRUGTX + IVHX + RACE + TREAT, data = uis, family="binomial")
+
+### Goodness of Fit test
+hoslem.test(m1$y, m1$fitted)
+
+
+### ROC curve and AUC
+myroc = roc(m1$y, m1$fitted)
+plot(myroc, print.auc=TRUE)
+```
 
 
 ### Survival Anslysis
