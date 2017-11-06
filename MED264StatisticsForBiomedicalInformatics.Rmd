@@ -2,7 +2,7 @@
 title: "MED264: Statistics for Biomedical Informaticss"
 institute: Department of Biomedical Informatics, UCSD
 author: "Jihoon Kim (j5kim@ucsd.edu)"
-date: "11/3/2017"
+date: "11/7/2017"
 output: html_document
 ---
 
@@ -16,25 +16,29 @@ Complements MATH283 Statistical Methods in Bioinformatics (Glenn Tesler; http://
 
 - Permutation test
 - Sample size/statistical power
-- Survival analysis
 - Interrater agreement
+- Logistic regression
+- Survival analysis
 
 
-### Install R,RStudio and R packages
+### Install R, RStudio and R packages
 
 1. Download and install R, a language and environment for statistical computing and graphics 
-https://cran.r-project.org/
+(https://cran.r-project.org/)
 
 2. Download and install RStudio Desktop
-https://www.rstudio.com/products/rstudio/download/ 
+(https://www.rstudio.com/products/rstudio/download/)
 
 3. Install R packages
-
 Below, take the comments out to run in R
 
 ```{r}
-# myPackages = c("ggplot2", "irr", "pwr", "survival")
+
+# myPackages = c( "CompQuadForm", "ggplot2", "irr", "knitr", "minqa",  "pwr", "survival")
 # install.packages( myPackages )
+
+### For Mac OS. Install an R package directly from a URL to a tar file
+# install.packages("http://www.biostat.umn.edu/~baolin/research/KATSP_0.1.0.tgz", repos=NULL)
 ```
 
 
@@ -251,7 +255,7 @@ legend(my.sigma[1], max(my.ssize)*0.9,  legend=my.epsilon, pch=c(1, 17, 22, 16),
 ```
    
    
-### R code to for sample size estimation
+### R code for sample size estimation about t-test
 ```{r, eval=FALSE}
 # DEFINE A FUNCTION
 ss.two_sample_mean = function(sigma, epsilon, alpha, beta) {
@@ -287,13 +291,163 @@ legend(my.sigma[1], max(my.ssize)*0.9,  legend=my.epsilon, pch=c(1, 17, 22, 16),
   
   
 ### pwr, an R packae for sample size estimation
-```{r, echo=FALSE}
+```{r}
 library(pwr)
 delta <- 0.05
 sigma <- 0.1
 d <- delta/sigma
 pwr.t.test(d = d, sig.level = 0.05, power = 0.8, type = 'two.sample')$n
 ```
+
+
+### Advanced application: power calculation for variant-set based association tests
+
+
+```{r, results = 'asis'}
+library(knitr)
+
+power.commonvariants = matrix(NA, 5, 5)
+power.commonvariants[,1] = c(1:5)*1000
+power.commonvariants[,2] = c(2, 16, 52, 82, 96)
+power.commonvariants[,3] = c(2, 16, 52, 82, 96)
+power.commonvariants[,4] = c(2, 16, 51, 82, 96)
+power.commonvariants[,5] = c(2, 20, 57, 86, 97)
+colnames(power.commonvariants) = c("n", "MonteCarlo", "Davies", "WuPankow", "Lee" )
+kable(power.commonvariants, caption="Estimated power for common G6PC2 variants at significance level 2.5 x 10^-6")
+
+power.rarevariants = matrix(NA, 5, 5)
+power.rarevariants[,1] = c(4, 6, 8, 10, 12)*1000
+power.rarevariants[,2] = c(7, 26, 54, 78, 92)
+power.rarevariants[,3] = c(7, 26, 53, 78, 92)
+power.rarevariants[,4] = c(7, 26, 53, 77, 91)
+power.rarevariants[,5] = c(9, 30, 59, 81, 93)
+colnames(power.rarevariants) = c("n", "MonteCarlo", "Davies", "WuPankow", "Lee" )
+kable(power.rarevariants, caption="Estimated power for rare G6PC2 variants at significance level 2.5 x 10^-6")
+```
+
+Reference: Wuet al. Ann Hum Genet 2016, On Sample Size and Power Calculation for Variant Set-Based Association Tests (https://www.ncbi.nlm.nih.gov/pubmed/26831402 )
+
+
+### R code: power calculation for variant-set based association tests
+```{r}
+## load R packages
+library(KATSP)
+library(minqa)
+library(CompQuadForm)
+
+## set the seed for randomization 
+set.seed(2017)
+
+## simulate genotype and es for QT
+## simulate 1e4 by 20 genotypes from MVN with pairwise corr=0.1
+Z1 = matrix(rnorm(1e4*20,0,sqrt(0.9)),1e4,20) + rnorm(1e4,0,sqrt(0.1))
+Z2 = matrix(rnorm(1e4*20,0,sqrt(0.9)),1e4,20) + rnorm(1e4,0,sqrt(0.1))
+
+## population MAF U[0.0005,0.02]
+maf = runif(20, 0.0005,0.02)
+q0 = qnorm(maf, lower=FALSE)
+G = t( I(t(Z1)>q0) + I(t(Z2)>q0) )
+
+## simulate es
+VLD = cov(G)
+MAF = colMeans(G)/2
+Ves = runif(20,-0.25,0.25)
+a1 = RVS.params(n=5e3,VLD,Ves,MAF)
+
+## power
+alpha = 2.5e-6
+powerComparison = 
+  c( davies.pwr(alpha,a1$lambda,a1$delta),
+     wu.pwr(alpha,a1$lambda,a1$delta),
+     lee.pwr(alpha,a1$lambda,a1$delta),
+     liu.pwr(alpha,a1$lambda,a1$delta) )
+names(powerComparison) = c("Davies", "Wu", "Lee", "Liu")
+powerComparison = round(powerComparison*100, 2)
+powerComparison
+```
+
+Reference: Wu et al. Ann Hum Genet 2016, On Sample Size and Power Calculation for Variant Set-Based Association Tests (https://www.ncbi.nlm.nih.gov/pubmed/26831402)
+
+
+### Interrater agreement
+
+- inter-rater agreement, inter-rater reliability or concordance
+
+- degree of agreement among raters
+
+- Cohen's kappa measures the inter-rater agreement between two raters
+
+- kappa values ranges between 0 and 1, 1 being the perfect agreemnt.
+
+- Fleiss' kappa measures the inter-rater agreement among more than two raters
+
+
+
+### Use of interrater agreement in biomedical science
+
+- Ofori et al. J Clin Lipidol 2017, Comparison of 3 risk estimators to guide initiation of statin therapy for primary prevention of cardiovascular disease. (https://www.ncbi.nlm.nih.gov/pubmed/29050979)
+
+- Girometti et al. Eur Radiol. 2017, Automated breast volume scanner (ABVS) in assessing breast cancer size: A comparison with conventional ultrasound and magnetic resonance imaging. (https://www.ncbi.nlm.nih.gov/pubmed/29018952)
+
+- Grady et al. Pac Symp Biocomput. 2010, Finding unique filter sets in PLATO: a precursor to efficient interaction analysis in GWAS data. (https://www.ncbi.nlm.nih.gov/pubmed/19908384)
+
+- Grelick et al. Acad Emerg Med. 2004, Performance of a novel clinical score, the Pediatric Asthma Severity Score (PASS), in the evaluation of acute asthma. (https://www.ncbi.nlm.nih.gov/pubmed/14709423)
+
+
+### Example: interrater agreement in CVD
+
+- TITLE: Comparison of 3 risk estimators to guide initiation of statin therapy for primary prevention of cardiovascular disease.
+
+- AUTHOR: Ofori S, Dodiyi-Manuel S, Akpa MR.
+
+- BACKGROUND: Among high-risk individuals, statins are beneficial for primary prevention of cardiovascular disease (CVD). In Nigeria, currently, there are no CVD prevention guidelines, so the use of CVD risk estimation to guide statin therapy is left to the discretion of the physician.
+
+- OBJECTIVE: The objective of the study was to compare 3 CVD risk estimation tools in the evaluation of patients presenting to a tertiary hospital in Nigeria.
+
+- METHODS: Cross-sectional study involving 295 patients with any CVD risk factors but not taking statins. Traditional CVD risk factors were assessed with a standard questionnaire and laboratory evaluation. Ten-year CVD risk was estimated with American College of Cardiology/American Heart Association Atherosclerotic Cardiovascular Disease (ACC/AHA ASCVD) Risk Estimator (2013), Framingham Risk Score (Framingham Risk Score [FRS] 2008), and the World Health Organisation/International Society of Hypertension (WHO/ISH) risk prediction chart for Africa Region D. Kappa statistic was used to determine agreement among the estimators.
+
+- RESULTS: The mean age was 48.4 ± 10.4 years; 60.7% were females. Risk factors for CVD were hypertension (56.3%), dyslipidemia (41.4%), diabetes (20%), obesity (28.5%), and cigarette smoking (4.4%). In all, 50.2%, 16.9%, and 15.2% were classified as high risk using the ACC/AHA ASCVD Risk Estimator, FRS 2008, and WHO/ISH risk chart, respectively. The agreement was moderate between FRS and WHO/ISH (Kappa 0.414, P < .001) and fair between ACC/AHA Estimator and WHO/ISH (Kappa 0.223, P < .001) and between ACC/AHA Estimator and FRS (Kappa 0.301, P < .001).
+
+- REFERENCE: Ofori et al. J Clin Lipidol 2017, Comparison of 3 risk estimators to guide initiation of statin therapy for primary prevention of cardiovascular disease. (https://www.ncbi.nlm.nih.gov/pubmed/29050979)
+
+
+### Bias introduced if ratings were analyzed as a correlation 
+
+```{r}
+rater1 = c(3, 4, 5, 6, 7, 8)
+rater2 = c(5, 6, 7, 8, 9, 10)
+
+raters.m = cbind(rater1, rater2)
+
+plot(rater1, rater2, 
+     main = paste("Pearson correlation = ", cor(rater1, rater2)) )
+
+```
+
+Reference: https://www.ncbi.nlm.nih.gov/pubmed/25852260 
+
+
+### Data object for interrater agreement
+
+```{r}
+library(irr)
+data(diagnoses)
+head(diagnoses)
+```
+
+
+### Cohen's Kappa for interrater agreement
+```{r}
+library(irr)
+data(diagnoses)
+kappa2( diagnoses[,1:2] )
+```
+
+
+### Logistic Regression
+
+
+
 
 ### Survival Anslysis
 - The most important difference between the outcome variables modeled via linear/logistic regression and survival analysis is the fact that we may observe the survival time partially
@@ -357,79 +511,4 @@ survdiff(Surv(time, censor) ~ drug, data=hmohiv, rho=0)
 ```
 
 
-
-### Interrater agreement
-
-- inter-rater agreement, inter-rater reliability or concordance
-
-- degree of agreement among raters
-
-- Cohen's kappa measures the inter-rater agreement between two raters
-
-- kappa values ranges between 0 and 1, 1 being the perfect agreemnt.
-
-- Fleiss' kappa measures the inter-rater agreement among more than two raters
-
-
-
-### Use of interrater agreement in biomedical science
-
-- Ofori et al. J Clin Lipidol 2017, Comparison of 3 risk estimators to guide initiation of statin therapy for primary prevention of cardiovascular disease. (https://www.ncbi.nlm.nih.gov/pubmed/29050979)
-
-- Girometti et al. Eur Radiol. 2017, Automated breast volume scanner (ABVS) in assessing breast cancer size: A comparison with conventional ultrasound and magnetic resonance imaging. (https://www.ncbi.nlm.nih.gov/pubmed/29018952)
-
-- Grady et al. Pac Symp Biocomput. 2010, Finding unique filter sets in PLATO: a precursor to efficient interaction analysis in GWAS data. (https://www.ncbi.nlm.nih.gov/pubmed/19908384)
-
-- Grelick et al. Acad Emerg Med. 2004, Performance of a novel clinical score, the Pediatric Asthma Severity Score (PASS), in the evaluation of acute asthma. (https://www.ncbi.nlm.nih.gov/pubmed/14709423)
-
-
-### Example: interrater agreement in CVD
-
-- TITLE: Comparison of 3 risk estimators to guide initiation of statin therapy for primary prevention of cardiovascular disease.
-
-- AUTHOR: Ofori S, Dodiyi-Manuel S, Akpa MR.
-
-- BACKGROUND: Among high-risk individuals, statins are beneficial for primary prevention of cardiovascular disease (CVD). In Nigeria, currently, there are no CVD prevention guidelines, so the use of CVD risk estimation to guide statin therapy is left to the discretion of the physician.
-
-
-- OBJECTIVE: The objective of the study was to compare 3 CVD risk estimation tools in the evaluation of patients presenting to a tertiary hospital in Nigeria.
-
-- METHODS: Cross-sectional study involving 295 patients with any CVD risk factors but not taking statins. Traditional CVD risk factors were assessed with a standard questionnaire and laboratory evaluation. Ten-year CVD risk was estimated with American College of Cardiology/American Heart Association Atherosclerotic Cardiovascular Disease (ACC/AHA ASCVD) Risk Estimator (2013), Framingham Risk Score (Framingham Risk Score [FRS] 2008), and the World Health Organisation/International Society of Hypertension (WHO/ISH) risk prediction chart for Africa Region D. Kappa statistic was used to determine agreement among the estimators.
-
-- RESULTS: The mean age was 48.4 ± 10.4 years; 60.7% were females. Risk factors for CVD were hypertension (56.3%), dyslipidemia (41.4%), diabetes (20%), obesity (28.5%), and cigarette smoking (4.4%). In all, 50.2%, 16.9%, and 15.2% were classified as high risk using the ACC/AHA ASCVD Risk Estimator, FRS 2008, and WHO/ISH risk chart, respectively. The agreement was moderate between FRS and WHO/ISH (Kappa 0.414, P < .001) and fair between ACC/AHA Estimator and WHO/ISH (Kappa 0.223, P < .001) and between ACC/AHA Estimator and FRS (Kappa 0.301, P < .001).
-
-- REFERENCE: Ofori et al. J Clin Lipidol 2017, Comparison of 3 risk estimators to guide initiation of statin therapy for primary prevention of cardiovascular disease. (https://www.ncbi.nlm.nih.gov/pubmed/29050979)
-
-
-### Bias introduced if ratings were analyzed as a correlation 
-
-```{r}
-rater1 = c(3, 4, 5, 6, 7, 8)
-rater2 = c(5, 6, 7, 8, 9, 10)
-
-raters.m = cbind(rater1, rater2)
-
-plot(rater1, rater2, 
-     main = paste("Pearson correlation = ", cor(rater1, rater2)) )
-
-```
-
-Reference: https://www.ncbi.nlm.nih.gov/pubmed/25852260 
-
-
-### Data object for interrater agreement
-
-```{r}
-library(irr)
-data(diagnoses)
-head(diagnoses)
-```
-
-
-### Cohen's Kappa for interrater agreement
-```{r}
-library(irr)
-data(diagnoses)
-kappa2( diagnoses[,1:2] )
-```
 
