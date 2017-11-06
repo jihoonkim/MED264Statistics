@@ -12,18 +12,31 @@ knitr::opts_chunk$set(echo = TRUE)
 
 
 ### Topics covered
+Complements MATH283 Statistical Methods in Bioinformatics (Glenn Tesler; http://www.math.ucsd.edu/~gptesler/283/calendar.html)
 
-- P-value
-- Distribution
+- Permutation test
 - Sample size/statistical power
 - Survival analysis
 - Interrater agreement
 
-### Install
+
+### Install R,RStudio and R packages
+
+1. Download and install R, a language and environment for statistical computing and graphics 
+https://cran.r-project.org/
+
+2. Download and install RStudio Desktop
+https://www.rstudio.com/products/rstudio/download/ 
+
+3. Install R packages
+
+Below, take the comments out to run in R
 
 ```{r}
-install.packages( myPackages )
+# myPackages = c("ggplot2", "irr", "pwr", "survival")
+# install.packages( myPackages )
 ```
+
 
 
 ### P-value 
@@ -347,6 +360,61 @@ survdiff(Surv(time, censor) ~ drug, data=hmohiv, rho=0)
 
 ### Interrater agreement
 
+- inter-rater agreement, inter-rater reliability or concordance
+
+- degree of agreement among raters
+
+- Cohen's kappa measures the inter-rater agreement between two raters
+
+- kappa values ranges between 0 and 1, 1 being the perfect agreemnt.
+
+- Fleiss' kappa measures the inter-rater agreement among more than two raters
+
+
+
+### Use of interrater agreement in biomedical science
+
+- Ofori et al. J Clin Lipidol 2017, Comparison of 3 risk estimators to guide initiation of statin therapy for primary prevention of cardiovascular disease. (https://www.ncbi.nlm.nih.gov/pubmed/29050979)
+
+- Girometti et al. Eur Radiol. 2017, Automated breast volume scanner (ABVS) in assessing breast cancer size: A comparison with conventional ultrasound and magnetic resonance imaging. (https://www.ncbi.nlm.nih.gov/pubmed/29018952)
+
+- Grady et al. Pac Symp Biocomput. 2010, Finding unique filter sets in PLATO: a precursor to efficient interaction analysis in GWAS data. (https://www.ncbi.nlm.nih.gov/pubmed/19908384)
+
+- Grelick et al. Acad Emerg Med. 2004, Performance of a novel clinical score, the Pediatric Asthma Severity Score (PASS), in the evaluation of acute asthma. (https://www.ncbi.nlm.nih.gov/pubmed/14709423)
+
+
+### Example: interrater agreement in CVD
+
+- TITLE: Comparison of 3 risk estimators to guide initiation of statin therapy for primary prevention of cardiovascular disease.
+
+- AUTHOR: Ofori S, Dodiyi-Manuel S, Akpa MR.
+
+- BACKGROUND: Among high-risk individuals, statins are beneficial for primary prevention of cardiovascular disease (CVD). In Nigeria, currently, there are no CVD prevention guidelines, so the use of CVD risk estimation to guide statin therapy is left to the discretion of the physician.
+
+
+- OBJECTIVE: The objective of the study was to compare 3 CVD risk estimation tools in the evaluation of patients presenting to a tertiary hospital in Nigeria.
+
+- METHODS: Cross-sectional study involving 295 patients with any CVD risk factors but not taking statins. Traditional CVD risk factors were assessed with a standard questionnaire and laboratory evaluation. Ten-year CVD risk was estimated with American College of Cardiology/American Heart Association Atherosclerotic Cardiovascular Disease (ACC/AHA ASCVD) Risk Estimator (2013), Framingham Risk Score (Framingham Risk Score [FRS] 2008), and the World Health Organisation/International Society of Hypertension (WHO/ISH) risk prediction chart for Africa Region D. Kappa statistic was used to determine agreement among the estimators.
+
+- RESULTS: The mean age was 48.4 ± 10.4 years; 60.7% were females. Risk factors for CVD were hypertension (56.3%), dyslipidemia (41.4%), diabetes (20%), obesity (28.5%), and cigarette smoking (4.4%). In all, 50.2%, 16.9%, and 15.2% were classified as high risk using the ACC/AHA ASCVD Risk Estimator, FRS 2008, and WHO/ISH risk chart, respectively. The agreement was moderate between FRS and WHO/ISH (Kappa 0.414, P < .001) and fair between ACC/AHA Estimator and WHO/ISH (Kappa 0.223, P < .001) and between ACC/AHA Estimator and FRS (Kappa 0.301, P < .001).
+
+- REFERENCE: Ofori et al. J Clin Lipidol 2017, Comparison of 3 risk estimators to guide initiation of statin therapy for primary prevention of cardiovascular disease. (https://www.ncbi.nlm.nih.gov/pubmed/29050979)
+
+
+### Bias introduced if ratings were analyzed as a correlation 
+
+```{r}
+rater1 = c(3, 4, 5, 6, 7, 8)
+rater2 = c(5, 6, 7, 8, 9, 10)
+
+raters.m = cbind(rater1, rater2)
+
+plot(rater1, rater2, 
+     main = paste("Pearson correlation = ", cor(rater1, rater2)) )
+
+```
+
+Reference: https://www.ncbi.nlm.nih.gov/pubmed/25852260 
 
 
 ### Data object for interrater agreement
