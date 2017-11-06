@@ -1,0 +1,367 @@
+---
+title: "MED264: Statistics for Biomedical Informaticss"
+institute: Department of Biomedical Informatics, UCSD
+author: "Jihoon Kim (j5kim@ucsd.edu)"
+date: "11/3/2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+### Topics covered
+
+- P-value
+- Distribution
+- Sample size/statistical power
+- Survival analysis
+- Interrater agreement
+
+### Install
+
+```{r}
+install.packages( myPackages )
+```
+
+
+### P-value 
+
+The p-value is the probability obtaining a test statistic as extreme as or
+more extreme than the observed statistic given that the null hypothesis is true
+
+
+### Understanding P-value through a permutation test
+
+- A randomization test is a permutation test based on
+randomization (random assignment).
+- Its goal is to test a null hypothesis about
+treatment effects in a randomized experiment. 
+- Can be used when the required distributional assumptions do
+NOT HOLD. 
+
+### Permutation test algorithm
+
+1. Compute an observed test statistic in the experiment data.
+2. Permute data(=rearrange data) and compute a new test statistic. Repeat multiple times. 
+3. Calculate the proportion of permuted test statistic values greater or equal to the observed one.
+4. This proportion is the P-value.
+
+
+### Permutation test example: Hypertension mouse model
+
+- Systolic blood pressure was measured in 250 progeny from a backcross between two mouse strains.
+- For simplicity, we focus on 50 (randomly chosen) mice genotyped at the D4Mit214 marker (although more markers were genotyped, chr4:45658442-45658566 bp, MGI:92846). 
+- The question is to see if there is an association between the D4Mit214 marker genotype (binary) and blood pressure level (continuous). 
+- The values  below show the systolic blood pressure (in mm of Hg) by the marker genotype, BA (heterozygous) or BB (homozygous) arranged in increasing order.
+- Reference: Copeland et al. Science 1993. A genetic linkage map of the mouse: current applications and future prospects.   
+
+
+### Plot of mouse hypertension data
+```{r, echo=FALSE}
+library(ggplot2)
+het = c(86, 88, 89, 89, 92, 93, 94, 94, 94, 
+      95, 95, 96, 96, 97, 97, 98, 98, 99, 
+      99, 101, 106, 107, 110, 113, 116, 118)
+hom = c(89, 90, 92, 93, 93, 96, 99, 99, 99, 102,
+  103, 104, 105, 106, 106, 107, 108, 108, 110, 110,
+  112, 114, 116, 116)
+cond = c(rep("het", length(het)), rep("hom", length(hom)))
+dat <- data.frame( cond, sbp=c(het, hom) )
+ggplot(dat, aes(x = sbp, fill = cond)) +
+   geom_density(alpha = 0.5)
+```
+
+
+### R code to draw density plots of hypertension data
+```{r, eval=FALSE}
+library(ggplot2)
+het = c(86, 88, 89, 89, 92, 93, 94, 94, 94, 
+      95, 95, 96, 96, 97, 97, 98, 98, 99, 
+      99, 101, 106, 107, 110, 113, 116, 118)
+hom = c(89, 90, 92, 93, 93, 96, 99, 99, 99, 102,
+  103, 104, 105, 106, 106, 107, 108, 108, 110, 110,
+  112, 114, 116, 116)
+cond = c(rep("het", length(het)), rep("hom", length(hom)))
+dat <- data.frame( cond, val=c(het, hom) )
+ggplot(dat, aes(x = val, fill = cond)) +
+   geom_density(alpha = 0.5)
+```
+
+
+### Boxplot of hypertension data
+```{r, eval=FALSE}
+library(ggplot2)
+het = c(86, 88, 89, 89, 92, 93, 94, 94, 94, 
+      95, 95, 96, 96, 97, 97, 98, 98, 99, 
+      99, 101, 106, 107, 110, 113, 116, 118)
+hom = c(89, 90, 92, 93, 93, 96, 99, 99, 99, 102,
+  103, 104, 105, 106, 106, 107, 108, 108, 110, 110,
+  112, 114, 116, 116)
+cond = c(rep("het", length(het)), rep("hom", length(hom)))
+dat <- data.frame( cond, sbp=c(het, hom) )
+ggplot(dat, aes(x=cond, y=sbp, fill=cond, width=0.3)) + 
+  geom_boxplot()
+```
+
+
+
+### R code to drawl boxplots of hypertension data
+```{r, echo=FALSE}
+library(ggplot2)
+het = c(86, 88, 89, 89, 92, 93, 94, 94, 94, 
+      95, 95, 96, 96, 97, 97, 98, 98, 99, 
+      99, 101, 106, 107, 110, 113, 116, 118)
+hom = c(89, 90, 92, 93, 93, 96, 99, 99, 99, 102,
+  103, 104, 105, 106, 106, 107, 108, 108, 110, 110,
+  112, 114, 116, 116)
+cond = c(rep("het", length(het)), rep("hom", length(hom)))
+dat <- data.frame( cond, sbp=c(het, hom) )
+ggplot(dat, aes(x=cond, y=sbp, fill=cond, width=0.3)) + 
+  geom_boxplot()
+```
+
+### R code for permutation test with hypertension data
+```{r}
+het = c(86, 88, 89, 89, 92, 93, 94, 94, 94, 
+        95, 95, 96, 96, 97, 97, 98, 98, 99, 
+       99, 101, 106, 107, 110, 113, 116, 118)
+hom = c(89, 90, 92, 93, 93, 96, 99, 99, 99, 102,
+  103, 104, 105, 106, 106, 107, 108, 108, 110, 110,
+  112, 114, 116, 116)
+set.seed(2017)
+diff.obs = mean(hom) - mean(het)
+n.perm=5000
+diff.perm=rep(NA, n.perm)
+len.het=length(het)
+len.hom=length(hom)
+hethom = c(het, hom)
+for (i in 1 : n.perm) {
+    het.perm = sample(hethom, len.het, replace=TRUE)
+    hom.perm = sample(hethom, len.hom, replace=TRUE)
+    diff.perm[i] = mean(hom.perm) - mean(het.perm)
+ }
+p.perm = sum( abs(diff.perm) >= abs(diff.obs) ) / n.perm
+print(p.perm)
+```
+
+
+### How to calculate P-value 
+
+Recall the definition: the p-value is the probability obtaining a test statistic as extreme as or
+more extrement than the observed statistic given that the null hypothesis is true.
+
+- In a parametric test (e.g. t-test), one makes assumptions about the parameters of the population
+distributions from which data are drawn and the p-value is calculated from this distribution function.
+
+- In a non-parametric test (e.g. wilcox test), one makes no assumptions about the parameters of the population and the p-value is calculated based on ranks and probabilities.
+
+- In a permutation test, there is no specific assumption about distributions,
+so test statistics are generated by permuting the data.
+
+
+### Statistical test of hypentension data
+```{r}
+het = c(86, 88, 89, 89, 92, 93, 94, 94, 94, 
+      95, 95, 96, 96, 97, 97, 98, 98, 99, 
+      99, 101, 106, 107, 110, 113, 116, 118)
+hom = c(89, 90, 92, 93, 93, 96, 99, 99, 99, 102,
+  103, 104, 105, 106, 106, 107, 108, 108, 110, 110,
+  112, 114, 116, 116)
+t.test(het, hom)$p.value
+wilcox.test(het, hom)$p.value
+```
+
+
+### Statistical power
+
+The power of a statistical test is the probability of correctly rejecting
+the null hypothesis when it is false and defined as
+1 - beta = Pr(reject null hupothesis when it is false)
+
+
+
+### Example: Coronary heart disease
+
+- Consider a clinical trial for evaluation of the effect of a test drug on cholesterol
+in patients with coronary heart disease (CHD).
+
+- Cholesterol is the main lipid associated with atherosclerotic vascular disease (ASVD). The purpose of cholesterol testing is to identify patients at risk for atherosclerosis. 
+
+- About 75% of the cholesterol is bound to low density lipoproteins (LDLs) and
+25% to high density lipoproteins (HDLs). Of these, LDL is the most directly associate with increased risk of CHD.
+
+- A pharmaceutical company is interested in conducting a clinical trial to compare two cholesterol lowering agents for treatment of patients with CHD through a parallel design. The primary efficacy parameter is the LDL. 
+
+- Suppose a difference of 5% in percent change of LDL is considered of clinically meaningful difference. 
+
+- Assume that the standard deviation is 10%.
+
+- What is the required sample size per group to achieve an 80% power at the 5% significance level?
+
+- Reference: Chow,S et al. (2008) Sample size calculations in clinical research. Boca Raton,FL. Chapman and Hall/CRC.
+
+
+### Estimate required sample size in a study
+```{r, echo=FALSE}
+# DEFINE A FUNCTION
+ss.two_sample_mean = function(sigma, epsilon, alpha, beta) {
+    term.top =  (qnorm(1-alpha/2) + qnorm(beta) )^2 * sigma^2 * 2
+    term.bottom <-  abs(epsilon)^2
+    return(  ceiling( term.top / term.bottom ) )
+}
+
+# RUN A FUNCTION FOR A CORONARY HEART DISEASE EXAMPLE
+ss.two_sample_mean(0.1, 0.05, 0.05, 0.8)
+# [1] 63
+
+# VARY PARAMETERS 
+my.sigma = seq(0.05, 0.3, 0.05); my.epsilon = seq(0.05, 0.2, 0.05)
+len.sigma = length(my.sigma); len.epsilon = length(my.epsilon);
+my.ssize = matrix(1, nrow=len.sigma, ncol=len.epsilon, byrow=TRUE)
+for(i in 1:len.sigma) {
+   for(j in 1:len.epsilon) {
+      my.ssize[i,j] = ss.two_sample_mean(my.sigma[i], my.epsilon[j], 0.05, 0.8)
+    }
+}
+
+# DRAW A PLOT
+my.color = c("red", "gold", "blue", "green4")
+plot(my.sigma, my.ssize[,1], type="b", ylim=c(0, max(my.ssize)), col = my.color[1],
+      xlab="standard deviation", ylab="Required sample size in one arm" )
+points(my.sigma, my.ssize[,2], type="b", pch=17, col=my.color[2] )
+points(my.sigma, my.ssize[,3], type="b", pch=22, col=my.color[3] )
+points(my.sigma, my.ssize[,4], type="b", pch=16, col=my.color[4] )
+legend(my.sigma[1], max(my.ssize)*0.9,  legend=my.epsilon, pch=c(1, 17, 22, 16), 
+    col = my.color, title="mean difference"  )
+```
+   
+   
+### R code to for sample size estimation
+```{r, eval=FALSE}
+# DEFINE A FUNCTION
+ss.two_sample_mean = function(sigma, epsilon, alpha, beta) {
+    term.top =  (qnorm(1-alpha/2) + qnorm(beta) )^2 * sigma^2 * 2
+    term.bottom <-  abs(epsilon)^2
+    return(  ceiling( term.top / term.bottom ) )
+}
+
+# RUN A FUNCTION FOR A CORONARY HEART DISEASE EXAMPLE
+ss.two_sample_mean(0.1, 0.05, 0.05, 0.8)
+# [1] 63
+
+# VARY PARAMETERS 
+my.sigma = seq(0.05, 0.3, 0.05); my.epsilon = seq(0.05, 0.2, 0.05)
+len.sigma = length(my.sigma); len.epsilon = length(my.epsilon);
+my.ssize = matrix(1, nrow=len.sigma, ncol=len.epsilon, byrow=TRUE)
+for(i in 1:len.sigma) {
+   for(j in 1:len.epsilon) {
+      my.ssize[i,j] = ss.two_sample_mean(my.sigma[i], my.epsilon[j], 0.05, 0.8)
+    }
+}
+
+# DRAW A PLOT
+my.color = c("red", "gold", "blue", "green4")
+plot(my.sigma, my.ssize[,1], type="b", ylim=c(0, max(my.ssize)), col = my.color[1],
+      xlab="standard deviation", ylab="Required sample size in one arm" )
+points(my.sigma, my.ssize[,2], type="b", pch=17, col=my.color[2] )
+points(my.sigma, my.ssize[,3], type="b", pch=22, col=my.color[3] )
+points(my.sigma, my.ssize[,4], type="b", pch=16, col=my.color[4] )
+legend(my.sigma[1], max(my.ssize)*0.9,  legend=my.epsilon, pch=c(1, 17, 22, 16), 
+    col = my.color, title="mean difference"  )
+```
+  
+  
+### pwr, an R packae for sample size estimation
+```{r, echo=FALSE}
+library(pwr)
+delta <- 0.05
+sigma <- 0.1
+d <- delta/sigma
+pwr.t.test(d = d, sig.level = 0.05, power = 0.8, type = 'two.sample')$n
+```
+
+### Survival Anslysis
+- The most important difference between the outcome variables modeled via linear/logistic regression and survival analysis is the fact that we may observe the survival time partially
+
+- For those subjects who died, it is the outcome variable of interest, the actual survival time. 
+
+- However, for subjects who were alive at the end of the study, or for subjects who were lost, the time variable indicates the length of follow-up, which is a partial or incomplete observation of survival time
+
+These incomplete observations are referred to as being censored
+
+- If we ignore the consoling and treat the censored observations as if they were measurements of survival time, then the resulting sample  statistics are NOT estimators of the respective parameters of the survival time distribution.
+
+- Reference:  Hosmer,DW et al. (1999) Applied Survival Analysis, Danvers,MA.  John Wiley and Sons, Inc.
+
+
+### Example: HIV
+- A large HMO wishes to evaluate the survival time of its HIV positive member using a follow-up study
+
+- Subjects were enrolled in the study from January 1, 1980 to December 3, 1991. The study ended December 31, 1995.
+
+- After a confirmed diagnosis of HIV, members were followed until death due to AIDS or AIDS-related complications, until the end of the study or until the subject was lost to follow-up. 
+
+- We assume that there were no deaths due to other causes (e.g. auto accident). 
+The primary outcome variable of interest is survival time after a confirmed diagnosis of HIV.
+
+- Among 100 patients, 49 had a history of prior intravenous drug use. 
+
+- Is there a difference in the survival curves between IV drug users and non-IV drug users?
+
+### Data object for survival analysis
+
+```{r}
+library(survival)
+fname = "https://stats.idre.ucla.edu/stat/r/examples/asa/hmohiv.csv"
+hmohiv = read.table(fname,sep=",", header = TRUE)
+head(hmohiv)
+```
+
+censor = 0 if the observation for survival time is complete and 1 if incomplete (=censored)
+
+### Survival curves
+```{r}
+library(survival)
+fname = "https://stats.idre.ucla.edu/stat/r/examples/asa/hmohiv.csv"
+hmohiv = read.table(fname,sep=",", header = TRUE)
+timestrata.surv <- survfit( Surv(time, censor) ~ strata(drug),
+                            hmohiv, 
+                            conf.type="log-log")
+plot(timestrata.surv, lty=c(1,3),
+     main = "HMO HIV",
+     xlab="Time", ylab="Survival Probability")
+legend(40, 1.0, c("Drug - No", "Drug - Yes") , lty=c(1,3) ) 
+```
+ 
+### Test for a difference between two survival curves
+```{r}
+library(survival)
+fname = "https://stats.idre.ucla.edu/stat/r/examples/asa/hmohiv.csv"
+hmohiv = read.table(fname,sep=",", header = TRUE)
+survdiff(Surv(time, censor) ~ drug, data=hmohiv, rho=0)
+```
+
+
+
+### Interrater agreement
+
+
+
+### Data object for interrater agreement
+
+```{r}
+library(irr)
+data(diagnoses)
+head(diagnoses)
+```
+
+
+### Cohen's Kappa for interrater agreement
+```{r}
+library(irr)
+data(diagnoses)
+kappa2( diagnoses[,1:2] )
+```
+
