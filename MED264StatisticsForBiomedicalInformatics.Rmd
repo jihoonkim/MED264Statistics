@@ -290,7 +290,7 @@ legend(my.sigma[1], max(my.ssize)*0.9,  legend=my.epsilon, pch=c(1, 17, 22, 16),
 ```
   
   
-### pwr, an R packae for sample size estimation
+### pwr, an R package for sample size estimation
 ```{r}
 library(pwr)
 delta <- 0.05
