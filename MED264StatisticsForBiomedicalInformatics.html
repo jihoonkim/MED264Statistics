@@ -564,8 +564,21 @@ kappa2( diagnoses[,1:2] )</code></pre>
 ##         z = 7 
 ##   p-value = 2.63e-12</code></pre>
 </div>
-<div id="logistic-regression" class="section level3">
-<h3>Logistic Regression</h3>
+<div id="difference-between-logistic-vs.linear-regression" class="section level3">
+<h3>Difference between logistic vs. linear regression</h3>
+<ol style="list-style-type: decimal">
+<li><p>Outcome variable is binary (or dichotomous), not continous.</p></li>
+<li>The nature of the relationship between the outcome and independent variables:</li>
+</ol>
+<ul>
+<li><p>linear regression: E[Y|x] = beta_0 + beta_1 * x</p></li>
+<li><p>logistic regression: logit( E[Y|x] ) = beta_0 + beta_1 * x</p>
+<p>where logit(t) = log(t / (1 - t))</p></li>
+<li><p>the conditional mean of the regressuib equation is formulated to be bounded between 0 and 1.</p></li>
+</ul>
+<ol start="3" style="list-style-type: decimal">
+<li>The conditional distribution of the outcome variable: binomial, not the normal.</li>
+</ol>
 </div>
 <div id="example-logistic-regression-treatment-for-drug-abuse" class="section level3">
 <h3>Example: logistic regression, treatment for drug abuse</h3>
