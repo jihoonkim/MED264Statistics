@@ -36,7 +36,7 @@ myPackageWishList = c( "CompQuadForm", "ggplot2", "irr", "knitr", "minqa",
                        "prLogistic", "pROC", "pwr", "ResourceSelection",  "survival")
 for( i in myPackageWishList) {
   if (!is.element(i, installed.packages()[,1])) 
-     install.packages(p, dep = TRUE)
+     install.packages(i, dep = TRUE)
   require( i, character.only = TRUE, warn.conflicts = FALSE, quietly = TRUE )
 }
 
@@ -74,14 +74,14 @@ NOT HOLD.
 ### Permutation test example: Hypertension mouse model
 
 - Systolic blood pressure was measured in 250 progeny from a backcross between two mouse strains.
-- For simplicity, we focus on 50 (randomly chosen) mice genotyped at the D4Mit214 marker (although more markers were genotyped, chr4:45658442-45658566 bp, MGI:92846). 
+- For simplicity, we focus on 50 (randomly chosen) mice genotyped at the D4Mit214 marker (although more markers were genotyped, chr4:45658442-45658566 bp, MGI:92846 http://www.informatics.jax.org/marker/MGI:92846). 
 - The question is to see if there is an association between the D4Mit214 marker genotype (binary) and blood pressure level (continuous). 
 - The values  below show the systolic blood pressure (in mm of Hg) by the marker genotype, BA (heterozygous) or BB (homozygous) arranged in increasing order.
 - Reference: Copeland et al. Science 1993. A genetic linkage map of the mouse: current applications and future prospects.   
 
 
 ### Plot of mouse hypertension data
-```{r, echo=FALSE}
+```{r}
 library(ggplot2)
 het = c(86, 88, 89, 89, 92, 93, 94, 94, 94, 
       95, 95, 96, 96, 97, 97, 98, 98, 99, 
@@ -96,41 +96,8 @@ ggplot(dat, aes(x = sbp, fill = cond)) +
 ```
 
 
-### R code to draw density plots of hypertension data
-```{r, eval=FALSE}
-library(ggplot2)
-het = c(86, 88, 89, 89, 92, 93, 94, 94, 94, 
-      95, 95, 96, 96, 97, 97, 98, 98, 99, 
-      99, 101, 106, 107, 110, 113, 116, 118)
-hom = c(89, 90, 92, 93, 93, 96, 99, 99, 99, 102,
-  103, 104, 105, 106, 106, 107, 108, 108, 110, 110,
-  112, 114, 116, 116)
-cond = c(rep("het", length(het)), rep("hom", length(hom)))
-dat <- data.frame( cond, val=c(het, hom) )
-ggplot(dat, aes(x = val, fill = cond)) +
-   geom_density(alpha = 0.5)
-```
-
-
 ### Boxplot of hypertension data
-```{r, eval=FALSE}
-library(ggplot2)
-het = c(86, 88, 89, 89, 92, 93, 94, 94, 94, 
-      95, 95, 96, 96, 97, 97, 98, 98, 99, 
-      99, 101, 106, 107, 110, 113, 116, 118)
-hom = c(89, 90, 92, 93, 93, 96, 99, 99, 99, 102,
-  103, 104, 105, 106, 106, 107, 108, 108, 110, 110,
-  112, 114, 116, 116)
-cond = c(rep("het", length(het)), rep("hom", length(hom)))
-dat <- data.frame( cond, sbp=c(het, hom) )
-ggplot(dat, aes(x=cond, y=sbp, fill=cond, width=0.3)) + 
-  geom_boxplot()
-```
-
-
-
-### R code to drawl boxplots of hypertension data
-```{r, echo=FALSE}
+```{r}
 library(ggplot2)
 het = c(86, 88, 89, 89, 92, 93, 94, 94, 94, 
       95, 95, 96, 96, 97, 97, 98, 98, 99, 
@@ -192,7 +159,7 @@ hom = c(89, 90, 92, 93, 93, 96, 99, 99, 99, 102,
   103, 104, 105, 106, 106, 107, 108, 108, 110, 110,
   112, 114, 116, 116)
 t.test(het, hom)$p.value
-wilcox.test(het, hom)$p.value
+wilcox.test(het, hom, exact=FALSE)$p.value
 ```
 
 
