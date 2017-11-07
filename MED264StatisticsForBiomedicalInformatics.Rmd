@@ -1,9 +1,11 @@
 ---
-title: "MED264: Statistics for Biomedical Informaticss"
-institute: Department of Biomedical Informatics, UCSD
+title: 'MED264: Statistics for Biomedical Informaticss'
 author: "Jihoon Kim (j5kim@ucsd.edu)"
 date: "11/7/2017"
-output: html_document
+output:
+  html_document: default
+  pdf_document: default
+institute: Department of Biomedical Informatics, UCSD
 ---
 
 ```{r setup, include=FALSE}
@@ -285,7 +287,9 @@ power.commonvariants[,3] = c(2, 16, 52, 82, 96)
 power.commonvariants[,4] = c(2, 16, 51, 82, 96)
 power.commonvariants[,5] = c(2, 20, 57, 86, 97)
 colnames(power.commonvariants) = c("n", "MonteCarlo", "Davies", "WuPankow", "Lee" )
-kable(power.commonvariants, caption="Estimated power for common G6PC2 variants at significance level 2.5 x 10^-6")
+kable(power.commonvariants, 
+      caption="Estimated power for rare variants of
+      G6PC2 gene at significance level 2.5 x 10^-6")
 
 power.rarevariants = matrix(NA, 5, 5)
 power.rarevariants[,1] = c(4, 6, 8, 10, 12)*1000
@@ -294,7 +298,9 @@ power.rarevariants[,3] = c(7, 26, 53, 78, 92)
 power.rarevariants[,4] = c(7, 26, 53, 77, 91)
 power.rarevariants[,5] = c(9, 30, 59, 81, 93)
 colnames(power.rarevariants) = c("n", "MonteCarlo", "Davies", "WuPankow", "Lee" )
-kable(power.rarevariants, caption="Estimated power for rare G6PC2 variants at significance level 2.5 x 10^-6")
+kable(power.rarevariants, 
+      caption="Estimated power for rare variants of 
+      G6PC2 gene at significance level 2.5 x 10^-6")
 ```
 
 Reference: Wuet al. Ann Hum Genet 2016, On Sample Size and Power Calculation for Variant Set-Based Association Tests (https://www.ncbi.nlm.nih.gov/pubmed/26831402 )
@@ -347,11 +353,11 @@ Reference: Wu et al. Ann Hum Genet 2016, On Sample Size and Power Calculation fo
 
 - degree of agreement among raters
 
-- Cohen's kappa measures the inter-rater agreement between two raters
+- Cohen's $\kappa$ measures the inter-rater agreement between two raters
 
-- kappa values ranges between 0 and 1, 1 being the perfect agreemnt.
+- $\kappa$ values ranges between 0 and 1, 1 being the perfect agreemnt.
 
-- Fleiss' kappa measures the inter-rater agreement among more than two raters
+- Fleiss' $\kappa$ measures the inter-rater agreement among more than two raters
 
 
 
@@ -419,14 +425,24 @@ kappa2( diagnoses[,1:2] )
 1. Outcome variable is binary (or dichotomous), not continous.
 
 2. The nature of the relationship between the outcome and independent variables: 
-  - linear regression: E[Y|x] = beta_0 + beta_1 * x
-   
-  - logistic regression: logit( E[Y|x] ) =  beta_0 + beta_1 * x
-    
-     where logit(t) = log(t / (1 - t))
+  - linear regression:
   
+     \[
+    E[Y|x] = \beta_0 + \beta_1  x
+     \]
+      
+  - logistic regression: 
   
-  - the conditional mean of the regressuib equation is formulated to be bounded between 0 and 1.
+     \[
+      logit( E[Y|x] ) = \beta_0 + \beta_1  x
+     \]
+     
+     where
+     \[
+     logit(t) = log( \frac{t}{1 - t} ) 
+     \]
+  
+  - the conditional mean of the regression equation is formulated to be bounded between 0 and 1.
   
   
 3. The conditional distribution of the outcome variable:  binomial, not the normal.

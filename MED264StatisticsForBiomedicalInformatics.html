@@ -353,9 +353,11 @@ power.commonvariants[,3] = c(2, 16, 52, 82, 96)
 power.commonvariants[,4] = c(2, 16, 51, 82, 96)
 power.commonvariants[,5] = c(2, 20, 57, 86, 97)
 colnames(power.commonvariants) = c(&quot;n&quot;, &quot;MonteCarlo&quot;, &quot;Davies&quot;, &quot;WuPankow&quot;, &quot;Lee&quot; )
-kable(power.commonvariants, caption=&quot;Estimated power for common G6PC2 variants at significance level 2.5 x 10^-6&quot;)</code></pre>
+kable(power.commonvariants, 
+      caption=&quot;Estimated power for rare variants of
+      G6PC2 gene at significance level 2.5 x 10^-6&quot;)</code></pre>
 <table>
-<caption>Estimated power for common G6PC2 variants at significance level 2.5 x 10^-6</caption>
+<caption>Estimated power for rare variants of G6PC2 gene at significance level 2.5 x 10^-6</caption>
 <thead>
 <tr class="header">
 <th align="right">n</th>
@@ -410,9 +412,11 @@ power.rarevariants[,3] = c(7, 26, 53, 78, 92)
 power.rarevariants[,4] = c(7, 26, 53, 77, 91)
 power.rarevariants[,5] = c(9, 30, 59, 81, 93)
 colnames(power.rarevariants) = c(&quot;n&quot;, &quot;MonteCarlo&quot;, &quot;Davies&quot;, &quot;WuPankow&quot;, &quot;Lee&quot; )
-kable(power.rarevariants, caption=&quot;Estimated power for rare G6PC2 variants at significance level 2.5 x 10^-6&quot;)</code></pre>
+kable(power.rarevariants, 
+      caption=&quot;Estimated power for rare variants of 
+      G6PC2 gene at significance level 2.5 x 10^-6&quot;)</code></pre>
 <table>
-<caption>Estimated power for rare G6PC2 variants at significance level 2.5 x 10^-6</caption>
+<caption>Estimated power for rare variants of G6PC2 gene at significance level 2.5 x 10^-6</caption>
 <thead>
 <tr class="header">
 <th align="right">n</th>
@@ -507,9 +511,9 @@ powerComparison</code></pre>
 <ul>
 <li><p>inter-rater agreement, inter-rater reliability or concordance</p></li>
 <li><p>degree of agreement among raters</p></li>
-<li><p>Cohen’s kappa measures the inter-rater agreement between two raters</p></li>
-<li><p>kappa values ranges between 0 and 1, 1 being the perfect agreemnt.</p></li>
-<li><p>Fleiss’ kappa measures the inter-rater agreement among more than two raters</p></li>
+<li><p>Cohen’s <span class="math inline">\(\kappa\)</span> measures the inter-rater agreement between two raters</p></li>
+<li><p><span class="math inline">\(\kappa\)</span> values ranges between 0 and 1, 1 being the perfect agreemnt.</p></li>
+<li><p>Fleiss’ <span class="math inline">\(\kappa\)</span> measures the inter-rater agreement among more than two raters</p></li>
 </ul>
 </div>
 <div id="use-of-interrater-agreement-in-biomedical-science" class="section level3">
@@ -586,10 +590,18 @@ kappa2( diagnoses[,1:2] )</code></pre>
 <li>The nature of the relationship between the outcome and independent variables:</li>
 </ol>
 <ul>
-<li><p>linear regression: E[Y|x] = beta_0 + beta_1 * x</p></li>
-<li><p>logistic regression: logit( E[Y|x] ) = beta_0 + beta_1 * x</p>
-<p>where logit(t) = log(t / (1 - t))</p></li>
-<li><p>the conditional mean of the regressuib equation is formulated to be bounded between 0 and 1.</p></li>
+<li><p>linear regression:</p>
+<p><span class="math display">\[
+E[Y|x] = \beta_0 + \beta_1  x
+ \]</span></p></li>
+<li><p>logistic regression:</p>
+<p><span class="math display">\[
+  logit( E[Y|x] ) = \beta_0 + \beta_1  x
+ \]</span></p>
+<p>where <span class="math display">\[
+ logit(t) = log( \frac{t}{1 - t} ) 
+ \]</span></p></li>
+<li><p>the conditional mean of the regression equation is formulated to be bounded between 0 and 1.</p></li>
 </ul>
 <ol start="3" style="list-style-type: decimal">
 <li>The conditional distribution of the outcome variable: binomial, not the normal.</li>
