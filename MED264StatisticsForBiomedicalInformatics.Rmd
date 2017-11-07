@@ -3,8 +3,8 @@ title: 'MED264: Statistics for Biomedical Informaticss'
 author: "Jihoon Kim (j5kim@ucsd.edu)"
 date: "11/7/2017"
 output:
-  html_document: default
   pdf_document: default
+  html_document: default
 institute: Department of Biomedical Informatics, UCSD
 ---
 
