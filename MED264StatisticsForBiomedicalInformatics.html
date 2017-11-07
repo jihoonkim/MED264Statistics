@@ -139,13 +139,37 @@ $(document).ready(function () {
 <ol style="list-style-type: decimal">
 <li><p>Download and install R, a language and environment for statistical computing and graphics (<a href="https://cran.r-project.org/" class="uri">https://cran.r-project.org/</a>)</p></li>
 <li><p>Download and install RStudio Desktop (<a href="https://www.rstudio.com/products/rstudio/download/" class="uri">https://www.rstudio.com/products/rstudio/download/</a>)</p></li>
-<li><p>Install R packages Below, take the comments out to run in R</p></li>
+<li><p>Install R packages</p></li>
 </ol>
-<pre class="r"><code># myPackages = c( &quot;CompQuadForm&quot;, &quot;ggplot2&quot;, &quot;irr&quot;, &quot;knitr&quot;, &quot;minqa&quot;, &quot;prLogistic&quot;, &quot;pROC&quot;, &quot;pwr&quot;, &quot;ResourceSelection&quot;,  &quot;survival&quot;)
-# install.packages( myPackages )
-
-### For Mac OS. Install an R package directly from a URL to a tar file
-# install.packages(&quot;http://www.biostat.umn.edu/~baolin/research/KATSP_0.1.0.tgz&quot;, repos=NULL)</code></pre>
+<pre class="r"><code>myPackageWishList = c( &quot;CompQuadForm&quot;, &quot;ggplot2&quot;, &quot;irr&quot;, &quot;knitr&quot;, &quot;minqa&quot;,
+                       &quot;prLogistic&quot;, &quot;pROC&quot;, &quot;pwr&quot;, &quot;ResourceSelection&quot;,  &quot;survival&quot;)
+for( i in myPackageWishList) {
+  if (!is.element(i, installed.packages()[,1])) 
+     install.packages(p, dep = TRUE)
+  require( i, character.only = TRUE, warn.conflicts = FALSE, quietly = TRUE )
+}</code></pre>
+<pre><code>## Warning: package 'lme4' was built under R version 3.4.2</code></pre>
+<pre><code>## 
+## Attaching package: 'lattice'</code></pre>
+<pre><code>## The following object is masked from 'package:boot':
+## 
+##     melanoma</code></pre>
+<pre><code>## 
+## Attaching package: 'survival'</code></pre>
+<pre><code>## The following object is masked from 'package:boot':
+## 
+##     aml</code></pre>
+<pre><code>## 
+## Attaching package: 'Hmisc'</code></pre>
+<pre><code>## The following objects are masked from 'package:base':
+## 
+##     format.pval, round.POSIXt, trunc.POSIXt, units</code></pre>
+<pre><code>## Type 'citation(&quot;pROC&quot;)' for a citation.</code></pre>
+<pre><code>## ResourceSelection 0.3-2   2017-02-28</code></pre>
+<pre class="r"><code>### For Mac OS. Install an R package directly from a URL to a tar file
+if (!is.element(&quot;KATSP&quot;, installed.packages()[,1])) 
+    install.packages(&quot;http://www.biostat.umn.edu/~baolin/research/KATSP_0.1.0.tgz&quot;, repos=NULL)
+require(&quot;KATSP&quot;,  character.only = TRUE,  warn.conflicts = FALSE, quietly = TRUE ) </code></pre>
 </div>
 <div id="p-value" class="section level3">
 <h3>P-value</h3>
@@ -531,9 +555,8 @@ plot(rater1, rater2,
 </div>
 <div id="data-object-for-interrater-agreement" class="section level3">
 <h3>Data object for interrater agreement</h3>
-<pre class="r"><code>library(irr)</code></pre>
-<pre><code>## Loading required package: lpSolve</code></pre>
-<pre class="r"><code>data(diagnoses)
+<pre class="r"><code>library(irr)
+data(diagnoses)
 head(diagnoses)</code></pre>
 <pre><code>##                    rater1                  rater2                  rater3
 ## 1             4. Neurosis             4. Neurosis             4. Neurosis
@@ -580,8 +603,8 @@ kappa2( diagnoses[,1:2] )</code></pre>
 <li>The conditional distribution of the outcome variable: binomial, not the normal.</li>
 </ol>
 </div>
-<div id="example-logistic-regression-treatment-for-drug-abuse" class="section level3">
-<h3>Example: logistic regression, treatment for drug abuse</h3>
+<div id="example-treatment-for-drug-abuse" class="section level3">
+<h3>Example: treatment for drug abuse</h3>
 <p>Goal was to compare treatment programs of different durations in the reduction of drug abuse and in the prevention of high-risk HIV behavior.</p>
 <ul>
 <li><p>DFREE: returned to drug use prior the study end date</p></li>
@@ -595,16 +618,10 @@ kappa2( diagnoses[,1:2] )</code></pre>
 </div>
 <div id="estimated-coefficients-in-a-treatment-study-for-drug-abuse" class="section level3">
 <h3>Estimated coefficients in a treatment study for drug abuse</h3>
-<pre class="r"><code>library(pROC)</code></pre>
-<pre><code>## Type 'citation(&quot;pROC&quot;)' for a citation.</code></pre>
-<pre><code>## 
-## Attaching package: 'pROC'</code></pre>
-<pre><code>## The following objects are masked from 'package:stats':
-## 
-##     cov, smooth, var</code></pre>
-<pre class="r"><code>library(ResourceSelection)</code></pre>
-<pre><code>## ResourceSelection 0.3-2   2017-02-28</code></pre>
-<pre class="r"><code>rawdata = read.table(&quot;http://course1.winona.edu/bdeppa/Biostatistics/Data%20Sets/umaru.txt&quot;,
+<pre class="r"><code>library(pROC)
+library(ResourceSelection)
+
+rawdata = read.table(&quot;http://course1.winona.edu/bdeppa/Biostatistics/Data%20Sets/umaru.txt&quot;,
                  header = T)
 uis = rawdata
 uis$IVHX = factor(rawdata$IVHX)

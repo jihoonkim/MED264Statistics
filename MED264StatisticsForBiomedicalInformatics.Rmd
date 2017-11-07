@@ -30,15 +30,20 @@ Complements MATH283 Statistical Methods in Bioinformatics (Glenn Tesler; http://
 (https://www.rstudio.com/products/rstudio/download/)
 
 3. Install R packages
-Below, take the comments out to run in R
 
 ```{r}
-
-# myPackages = c( "CompQuadForm", "ggplot2", "irr", "knitr", "minqa", "prLogistic", "pROC", "pwr", "ResourceSelection",  "survival")
-# install.packages( myPackages )
+myPackageWishList = c( "CompQuadForm", "ggplot2", "irr", "knitr", "minqa",
+                       "prLogistic", "pROC", "pwr", "ResourceSelection",  "survival")
+for( i in myPackageWishList) {
+  if (!is.element(i, installed.packages()[,1])) 
+     install.packages(p, dep = TRUE)
+  require( i, character.only = TRUE, warn.conflicts = FALSE, quietly = TRUE )
+}
 
 ### For Mac OS. Install an R package directly from a URL to a tar file
-# install.packages("http://www.biostat.umn.edu/~baolin/research/KATSP_0.1.0.tgz", repos=NULL)
+if (!is.element("KATSP", installed.packages()[,1])) 
+    install.packages("http://www.biostat.umn.edu/~baolin/research/KATSP_0.1.0.tgz", repos=NULL)
+require("KATSP",  character.only = TRUE,  warn.conflicts = FALSE, quietly = TRUE ) 
 ```
 
 
@@ -462,7 +467,7 @@ kappa2( diagnoses[,1:2] )
 
 
 
-### Example: logistic regression, treatment for drug abuse
+### Example: treatment for drug abuse
 
 Goal was to compare treatment programs of different durations in the reduction of drug abuse and in the prevention of high-risk HIV behavior.
 
