@@ -1,7 +1,7 @@
 ---
 title: 'MED264: Statistics for Biomedical Informaticss'
 author: "Jihoon Kim (j5kim@ucsd.edu)"
-date: "11/7/2017"
+date: "7/29/2021"
 output:
   pdf_document: default
   html_document: default
@@ -169,7 +169,7 @@ wilcox.test(het, hom, exact=FALSE)$p.value
 
 The power of a statistical test is the probability of correctly rejecting
 the null hypothesis when it is false and defined as
-1 - beta = Pr(reject null hupothesis when it is false)
+1 - beta = Pr(reject null hypothesis when it is false)
 
 
 
